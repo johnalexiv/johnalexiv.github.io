@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>John Alexander — Senior Data Scientist</title>
+  <meta name="description" content="Senior Data Scientist & MLOps Engineer building scalable AI/ML systems at Amazon. $65M+ revenue impact." />
+
+  <!-- Google Fonts: Midnight Luxe preset -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700;1,900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CDN with config -->
+  <script>
+    window.tailwindConfig = {
+      theme: {
+        extend: {
+          colors: {
+            obsidian: '#0D0D12',
+            champagne: '#C9A84C',
+            ivory: '#FAF8F5',
+            slate: '#2A2A35',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['"Playfair Display"', 'serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = window.tailwindConfig</script>
+
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: #0D0D12;
+      color: #FAF8F5;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── Noise overlay ── */
+    #noise {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 9999;
+      opacity: 0.05;
+    }
+
+    /* ── Magnetic button ── */
+    .btn-mag {
+      position: relative; overflow: hidden;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      transition: transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.3s ease;
+    }
+    .btn-mag:hover { transform: scale(1.03); }
+    .btn-slide {
+      position: absolute; inset: 0;
+      transform: translateX(-101%);
+      transition: transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+      pointer-events: none;
+    }
+    .btn-mag:hover .btn-slide { transform: translateX(0); }
+    .btn-label { position: relative; z-index: 1; }
+
+    /* ── Link lift ── */
+    .link-lift {
+      display: inline-block;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+    .link-lift:hover { transform: translateY(-1px); }
+
+    /* ── Blink cursor ── */
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    .blink { animation: blink 1s step-end infinite; }
+
+    /* ── Pulse dot ── */
+    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.6)} }
+    .pulse-dot { display:inline-block; animation: pulse-dot 2s ease-in-out infinite; }
+
+    /* ── SVG animations ── */
+    @keyframes rotate-slow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+    @keyframes rotate-rev  { from{transform:rotate(360deg)} to{transform:rotate(0deg)} }
+    @keyframes scan-line   { 0%{transform:translateX(-120%)} 100%{transform:translateX(220%)} }
+    @keyframes waveform    { from{stroke-dashoffset:800} to{stroke-dashoffset:0} }
+
+    .rotate-cw  { animation: rotate-slow 12s linear infinite; transform-origin: 100px 100px; }
+    .rotate-ccw { animation: rotate-rev 8s linear infinite; transform-origin: 100px 100px; }
+    .scan-beam  { animation: scan-line 2.8s linear infinite; }
+    .wave-draw  { stroke-dasharray:800; animation: waveform 3s linear infinite; }
+
+    /* ── Card spring ── */
+    .spring { transition: all 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #0D0D12; }
+    ::-webkit-scrollbar-thumb { background: #C9A84C44; border-radius: 999px; }
+
+    /* ── Typewriter feed ── */
+    #feed-lines div { color: rgba(250,248,245,0.35); font-size:11px; line-height:1.8; }
+    #feed-current   { color: #C9A84C; font-size:11px; line-height:1.8; }
+
+    /* ── Shuffler cards ── */
+    .shuffle-card {
+      position: absolute; left:0; right:0;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 1rem;
+      padding: 12px 18px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    /* ── Nav active ── */
+    .nav-scrolled {
+      background: rgba(13,13,18,0.78) !important;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(201,168,76,0.22) !important;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    /* ── Skill pill hover ── */
+    .skill-pill:hover {
+      border-color: rgba(201,168,76,0.5);
+      color: #C9A84C;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─────────────── NOISE OVERLAY ─────────────── -->
+<svg id="noise" xmlns="http://www.w3.org/2000/svg">
+  <filter id="grain">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
+    <feColorMatrix type="saturate" values="0"/>
+  </filter>
+  <rect width="100%" height="100%" filter="url(#grain)"/>
+</svg>
+
+
+<!-- ─────────────── NAVBAR ─────────────── -->
+<nav id="navbar"
+  class="fixed top-4 left-1/2 z-50 px-6 py-3 rounded-full flex items-center gap-5 transition-all duration-500"
+  style="transform:translateX(-50%); border:1px solid transparent;"
+>
+  <span id="nav-logo" class="font-mono font-bold text-sm tracking-widest text-ivory/80">JA</span>
+
+  <div class="hidden md:flex items-center gap-5">
+    <a href="#about"      class="link-lift font-sans text-sm font-medium text-ivory/60 hover:text-ivory transition-colors">About</a>
+    <a href="#experience" class="link-lift font-sans text-sm font-medium text-ivory/60 hover:text-ivory transition-colors">Experience</a>
+    <a href="#skills"     class="link-lift font-sans text-sm font-medium text-ivory/60 hover:text-ivory transition-colors">Skills</a>
+    <a href="#contact"    class="link-lift font-sans text-sm font-medium text-ivory/60 hover:text-ivory transition-colors">Contact</a>
+  </div>
+
+  <a href="#contact"
+    class="btn-mag bg-champagne text-obsidian font-sans font-bold text-xs tracking-widest uppercase px-5 py-2.5 rounded-full"
+  >
+    <span class="btn-slide bg-ivory"></span>
+    <span class="btn-label">View My Work</span>
+  </a>
+</nav>
+
+
+<!-- ─────────────── HERO ─────────────── -->
+<section id="about"
+  class="relative flex flex-col justify-end overflow-hidden"
+  style="height:100dvh; padding: 0 5rem 6rem;"
+>
+  <!-- Background image -->
+  <div class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+    style="background-image:url('https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=1920&q=80')">
+  </div>
+  <div class="absolute inset-0" style="background:linear-gradient(to top, #0D0D12 0%, rgba(13,13,18,.78) 50%, rgba(13,13,18,.22) 100%)"></div>
+  <div class="absolute inset-0" style="background:linear-gradient(to right, rgba(13,13,18,.88) 0%, rgba(13,13,18,.15) 60%, transparent 100%)"></div>
+
+  <!-- Content -->
+  <div class="relative z-10 max-w-4xl">
+    <p id="hero-eyebrow" class="font-mono text-champagne text-xs tracking-widest uppercase mb-6" style="letter-spacing:.3em; opacity:0">
+      Senior Data Scientist · MLOps · E2E AI/ML Solutions
+    </p>
+    <h1 class="leading-none mb-8">
+      <span id="hero-line1" class="block font-sans font-black text-ivory tracking-tight" style="font-size:clamp(2.8rem,7vw,6rem); opacity:0">
+        Intelligence meets
+      </span>
+      <span id="hero-line2" class="block font-serif italic text-champagne" style="font-size:clamp(4rem,12vw,10rem); line-height:.95; opacity:0">
+        Impact.
+      </span>
+    </h1>
+    <p id="hero-body" class="font-sans mb-10 max-w-xl leading-relaxed" style="color:rgba(250,248,245,.55); font-size:clamp(.9rem,1.5vw,1.1rem); opacity:0">
+      Building scalable AI/ML systems at Amazon and Zappos that turn data into
+      measurable revenue — $65M+ in cumulative impact, shipped to production.
+    </p>
+    <div id="hero-cta" class="flex flex-wrap items-center gap-4" style="opacity:0">
+      <a href="#experience"
+        class="btn-mag bg-champagne text-obsidian font-sans font-bold text-sm tracking-widest uppercase px-8 py-4 rounded-full"
+      >
+        <span class="btn-slide bg-ivory"></span>
+        <span class="btn-label">View My Work</span>
+        <span class="btn-label">↓</span>
+      </a>
+      <a href="mailto:johnalexiv@gmail.com"
+        class="link-lift font-mono text-xs tracking-widest uppercase"
+        style="color:rgba(250,248,245,.45)"
+      >
+        johnalexiv@gmail.com
+      </a>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="absolute bottom-10 right-20 flex flex-col items-center gap-3" style="opacity:.28">
+    <div class="w-px" style="height:4rem;background:linear-gradient(to bottom,#FAF8F5,transparent)"></div>
+    <span class="font-mono text-ivory" style="font-size:10px;letter-spacing:.3em;writing-mode:vertical-rl">SCROLL</span>
+  </div>
+</section>
+
+
+<!-- ─────────────── FEATURES ─────────────── -->
+<section id="experience" class="py-32 px-8 md:px-20" style="background:#0D0D12">
+  <div id="feat-head" class="mb-16" style="opacity:0;transform:translateY(40px)">
+    <p class="font-mono text-champagne text-xs uppercase mb-4" style="letter-spacing:.35em">What I Build</p>
+    <h2 class="font-sans font-black text-ivory tracking-tight" style="font-size:clamp(2.2rem,6vw,4rem);line-height:.9">
+      Functional<br>
+      <span class="font-serif italic text-champagne">Artifacts</span>
+    </h2>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <!-- Card 1: Diagnostic Shuffler -->
+    <div id="card1" class="rounded-3xl border p-8 flex flex-col gap-5 shadow-2xl" style="background:#FAF8F5;border-color:rgba(201,168,76,.15);opacity:0;transform:translateY(60px)">
+      <div class="flex items-start justify-between">
+        <div>
+          <span class="font-mono text-champagne uppercase" style="font-size:10px;letter-spacing:.2em">01 — Systems</span>
+          <h3 class="font-sans font-black text-obsidian text-xl mt-1 tracking-tight">Agentic AI & NLP</h3>
+        </div>
+        <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background:rgba(201,168,76,.15)">
+          <span class="text-champagne text-xs font-mono">↻</span>
+        </div>
+      </div>
+      <p class="font-sans text-sm leading-relaxed" style="color:rgba(42,42,53,.6)">
+        Expert systems and language models that understand user intent at scale — shipped to production.
+      </p>
+      <div class="relative" style="height:110px">
+        <!-- Shuffler stack rendered by JS -->
+        <div id="shuffler-stack"></div>
+      </div>
+      <div class="font-mono" style="font-size:10px;color:rgba(42,42,53,.4);letter-spacing:.1em">
+        Amazon · 94.93% entity extraction accuracy
+      </div>
+    </div>
+
+    <!-- Card 2: Telemetry Typewriter -->
+    <div id="card2" class="rounded-3xl border p-8 flex flex-col gap-5 shadow-2xl" style="background:#0D0D12;border-color:rgba(201,168,76,.2);opacity:0;transform:translateY(60px)">
+      <div class="flex items-start justify-between">
+        <div>
+          <span class="font-mono text-champagne uppercase" style="font-size:10px;letter-spacing:.2em">02 — Intelligence</span>
+          <h3 class="font-sans font-black text-ivory text-xl mt-1 tracking-tight">Product Discovery</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="pulse-dot w-2 h-2 rounded-full" style="background:#C9A84C;width:8px;height:8px;border-radius:999px;display:inline-block"></span>
+          <span class="font-mono text-champagne" style="font-size:10px;letter-spacing:.2em">LIVE</span>
+        </div>
+      </div>
+      <p class="font-sans text-sm leading-relaxed" style="color:rgba(250,248,245,.45)">
+        ML ranking and NLP systems running in production across millions of daily queries.
+      </p>
+      <div class="rounded-2xl p-5 font-mono overflow-hidden border" style="background:#08080E;min-height:130px;border-color:rgba(250,248,245,.05)">
+        <div id="feed-lines"></div>
+        <div id="feed-current"></div>
+      </div>
+      <div class="font-mono" style="font-size:10px;color:rgba(250,248,245,.25);letter-spacing:.1em">
+        Amazon · Zappos · Production Systems
+      </div>
+    </div>
+
+    <!-- Card 3: Cursor Scheduler -->
+    <div id="card3" class="rounded-3xl border p-8 flex flex-col gap-5 shadow-2xl" style="background:#FAF8F5;border-color:rgba(201,168,76,.15);opacity:0;transform:translateY(60px)">
+      <div class="flex items-start justify-between">
+        <div>
+          <span class="font-mono text-champagne uppercase" style="font-size:10px;letter-spacing:.2em">03 — Outcomes</span>
+          <h3 class="font-sans font-black text-obsidian text-xl mt-1 tracking-tight">Revenue Impact</h3>
+        </div>
+        <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background:rgba(201,168,76,.15)">
+          <span class="text-champagne text-xs">$</span>
+        </div>
+      </div>
+      <p class="font-sans text-sm leading-relaxed" style="color:rgba(42,42,53,.6)">
+        Every shipped model tied to a measurable business outcome — in the tens of millions.
+      </p>
+      <div class="rounded-2xl p-5 border" style="background:#fff;border-color:rgba(0,0,0,.07)">
+        <div class="font-mono uppercase mb-3" style="font-size:10px;color:rgba(42,42,53,.4);letter-spacing:.2em">Impact Sprint — Q1</div>
+        <div class="grid gap-1.5" id="day-grid" style="display:grid;grid-template-columns:repeat(7,1fr)"></div>
+        <div class="mt-4 flex items-center justify-between" style="min-height:28px">
+          <span id="sched-label" class="font-mono text-xs" style="color:rgba(42,42,53,.5)">Calculating impact…</span>
+          <button id="deploy-btn" class="font-mono text-xs px-4 py-1.5 rounded-xl font-bold transition-transform"
+            style="background:#C9A84C;color:#0D0D12;display:none">Deploy ✓</button>
+        </div>
+      </div>
+      <div class="font-mono" style="font-size:10px;color:rgba(42,42,53,.4);letter-spacing:.1em">
+        $65M+ cumulative impact · 2018–present
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ─────────────── EXPERIENCE TIMELINE ─────────────── -->
+<section class="py-24 px-8 md:px-20" style="background:#0D0D12;border-top:1px solid rgba(250,248,245,.05)">
+  <div id="exp-head" class="mb-14" style="opacity:0;transform:translateY(40px)">
+    <p class="font-mono text-champagne text-xs uppercase mb-4" style="letter-spacing:.35em">Career</p>
+    <h2 class="font-sans font-black text-ivory tracking-tight" style="font-size:clamp(2.2rem,6vw,4rem);line-height:.9">
+      Where I've<br>
+      <span class="font-serif italic text-champagne">Shipped</span>
+    </h2>
+  </div>
+
+  <!-- Amazon -->
+  <div class="exp-item py-10 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-8" style="border-bottom:1px solid rgba(250,248,245,.08);opacity:0;transform:translateX(-30px)">
+    <div>
+      <div class="font-sans font-black text-ivory text-xl tracking-tight">Amazon</div>
+      <div class="font-sans font-medium text-champagne text-sm mt-1">Data Scientist II</div>
+      <div class="font-mono text-xs mt-3" style="color:rgba(250,248,245,.35);letter-spacing:.08em">Oct 2022 — Present</div>
+      <div class="font-mono text-xs mt-1" style="color:rgba(250,248,245,.25);letter-spacing:.08em">Las Vegas, NV</div>
+    </div>
+    <ul class="space-y-3 pt-1">
+      <li class="flex items-start gap-3"><span class="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:#C9A84C"></span><span class="font-sans text-sm leading-relaxed" style="color:rgba(250,248,245,.65)">Architected Agentic AI runner expert system for natural language shoe discovery — projected $18M–$25M annualized sales.</span></li>
+      <li class="flex items-start gap-3"><span class="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:#C9A84C"></span><span class="font-sans text-sm leading-relaxed" style="color:rgba(250,248,245,.65)">Built ML ranking algorithm improving product discovery for 70% of search users: +2.3% sales (~$30M), +1.03% CTR.</span></li>
+      <li class="flex items-start gap-3"><span class="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:#C9A84C"></span><span class="font-sans text-sm leading-relaxed" style="color:rgba(250,248,245,.65)">Developed computer vision fabric swatch model enabling dynamic product grouping: +25% impressions, +2% gross sales.</span></li>
+      <li class="flex items-start gap-3"><span class="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:#C9A84C"></span><span class="font-sans text-sm leading-relaxed" style="color:rgba(250,248,245,.65)">Shipped NER system extracting entities across 9 attributes and 1200+ values from user queries at 94.93% accuracy.</span></li>
+    </ul>
+  </div>
+
+  <!-- Zappos DS -->
+  <div class="exp-item py-10 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-8" style="border-bottom:1px solid rgba(250,248,245,.08);opacity:0;transform:translateX(-30px)">
+    <div>
+      <div class="font-sans font-black text-ivory text-xl tracking-tight">Zappos</div>
+      <div class="font-sans font-medium text-champagne text-sm mt-1">Data Scientist</div>
+      <div class="font-mono text-xs mt-3" style="color:rgba(250,248,245,.35);letter-spacing:.08em">Feb 2019 — Oct 2022</div>
+      <div class="font-mono text-xs mt-1" style="color:rgba(250,248,245,.25);letter-spacing:.08em">Las Vegas, NV</div>
+    </div>
+    <ul class="space-y-3 pt-1">
+      <li class="flex items-start gap-3"><span class="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:#C9A84C"></span><span class="font-sans text-sm leading-relaxed" style="color:rgba(250,248,245,.65)">E2E shoe size recommendation service for 25% of PDP views — 10.09% reduction in sizing-related returns.</span></li>
+      <li class="flex items-start gap-3"><span class="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:#C9A84C"></span><span class="font-sans text-sm leading-relaxed" style="color:rgba(250,248,245,.65)">Scalable multi-region query understanding platform enabling brand/gender/type autofilter — +0.8% sales (~$10.6M).</span></li>
+      <li class="flex items-start gap-3"><span class="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:#C9A84C"></span><span class="font-sans text-sm leading-relaxed" style="color:rgba(250,248,245,.65)">Deep learning image embeddings for visual search and style recommendations across full product catalog.</span></li>
+    </ul>
+  </div>
+
+  <!-- Zappos Jr -->
+  <div class="exp-item py-10 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-8" style="border-bottom:1px solid rgba(250,248,245,.08);opacity:0;transform:translateX(-30px)">
+    <div>
+      <div class="font-sans font-black text-ivory text-xl tracking-tight">Zappos</div>
+      <div class="font-sans font-medium text-champagne text-sm mt-1">Junior Data Scientist</div>
+      <div class="font-mono text-xs mt-3" style="color:rgba(250,248,245,.35);letter-spacing:.08em">Jul 2018 — Feb 2019</div>
+    </div>
+    <ul class="space-y-3 pt-1">
+      <li class="flex items-start gap-3"><span class="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:#C9A84C"></span><span class="font-sans text-sm leading-relaxed" style="color:rgba(250,248,245,.65)">ML algorithm suggesting high-performing Google SEM keywords — +1.2% annual sales uplift.</span></li>
+      <li class="flex items-start gap-3"><span class="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:#C9A84C"></span><span class="font-sans text-sm leading-relaxed" style="color:rgba(250,248,245,.65)">Custom neural networks backfilling product taxonomy at 99% accuracy, resolving data sparsity for downstream models.</span></li>
+    </ul>
+  </div>
+
+  <!-- Education -->
+  <div class="exp-item py-10 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-8" style="opacity:0;transform:translateX(-30px)">
+    <div>
+      <div class="font-sans font-black text-ivory text-xl tracking-tight">UNLV</div>
+      <div class="font-sans font-medium text-champagne text-sm mt-1">B.S., Computer Science</div>
+      <div class="font-mono text-xs mt-3" style="color:rgba(250,248,245,.35);letter-spacing:.08em">2013 — 2018</div>
+    </div>
+    <p class="font-sans text-sm leading-relaxed pt-1" style="color:rgba(250,248,245,.45)">
+      University of Nevada, Las Vegas. Foundation in algorithms, data structures, software engineering, and machine learning fundamentals.
+    </p>
+  </div>
+</section>
+
+
+<!-- ─────────────── PHILOSOPHY ─────────────── -->
+<section id="skills" class="relative py-40 px-8 md:px-20 overflow-hidden" style="background:#2A2A35">
+  <div class="absolute inset-0 bg-cover bg-center" style="background-image:url('https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1920&q=80');opacity:.07"></div>
+
+  <div class="relative z-10 max-w-5xl">
+    <p id="phil-contra" class="font-sans leading-relaxed mb-10" style="color:rgba(250,248,245,.45);font-size:clamp(1rem,2.5vw,1.5rem);opacity:0;transform:translateY(20px)">
+      Most data scientists focus on: model accuracy, benchmark scores, and academic metrics.
+    </p>
+    <p id="phil-main" class="font-sans font-light leading-relaxed" style="color:#FAF8F5;font-size:clamp(1.4rem,3.5vw,2.5rem);opacity:0;transform:translateY(30px)">
+      I focus on:&nbsp;
+      <span class="font-serif italic text-champagne" style="font-size:clamp(2.2rem,6vw,5rem);line-height:1">shipped systems</span>
+      &nbsp;that move the needle.
+    </p>
+  </div>
+
+  <!-- Skill pills -->
+  <div id="skills-pills" class="relative z-10 mt-16 flex flex-wrap gap-2 max-w-4xl" style="opacity:0;transform:translateY(20px)">
+    <span class="skill-pill font-mono text-xs border rounded-full px-4 py-1.5 transition-colors cursor-default" style="color:rgba(250,248,245,.55);border-color:rgba(250,248,245,.15)">Python</span>
+    <span class="skill-pill font-mono text-xs border rounded-full px-4 py-1.5 transition-colors cursor-default" style="color:rgba(250,248,245,.55);border-color:rgba(250,248,245,.15)">Agentic AI</span>
+    <span class="skill-pill font-mono text-xs border rounded-full px-4 py-1.5 transition-colors cursor-default" style="color:rgba(250,248,245,.55);border-color:rgba(250,248,245,.15)">MLOps</span>
+    <span class="skill-pill font-mono text-xs border rounded-full px-4 py-1.5 transition-colors cursor-default" style="color:rgba(250,248,245,.55);border-color:rgba(250,248,245,.15)">Keras</span>
+    <span class="skill-pill font-mono text-xs border rounded-full px-4 py-1.5 transition-colors cursor-default" style="color:rgba(250,248,245,.55);border-color:rgba(250,248,245,.15)">TensorFlow</span>
+    <span class="skill-pill font-mono text-xs border rounded-full px-4 py-1.5 transition-colors cursor-default" style="color:rgba(250,248,245,.55);border-color:rgba(250,248,245,.15)">PyTorch</span>
+    <span class="skill-pill font-mono text-xs border rounded-full px-4 py-1.5 transition-colors cursor-default" style="color:rgba(250,248,245,.55);border-color:rgba(250,248,245,.15)">NumPy</span>
+    <span class="skill-pill font-mono text-xs border rounded-full px-4 py-1.5 transition-colors cursor-default" style="color:rgba(250,248,245,.55);border-color:rgba(250,248,245,.15)">Pandas</span>
+    <span class="skill-pill font-mono text-xs border rounded-full px-4 py-1.5 transition-colors cursor-default" style="color:rgba(250,248,245,.55);border-color:rgba(250,248,245,.15)">LangChain</span>
+    <span class="skill-pill font-mono text-xs border rounded-full px-4 py-1.5 transition-colors cursor-default" style="color:rgba(250,248,245,.55);border-color:rgba(250,248,245,.15)">RAG</span>
+    <span class="skill-pill font-mono text-xs border rounded-full px-4 py-1.5 transition-colors cursor-default" style="color:rgba(250,248,245,.55);border-color:rgba(250,248,245,.15)">Computer Vision</span>
+    <span class="skill-pill font-mono text-xs border rounded-full px-4 py-1.5 transition-colors cursor-default" style="color:rgba(250,248,245,.55);border-color:rgba(250,248,245,.15)">E2E Deployment</span>
+    <span class="skill-pill font-mono text-xs border rounded-full px-4 py-1.5 transition-colors cursor-default" style="color:rgba(250,248,245,.55);border-color:rgba(250,248,245,.15)">AWS</span>
+    <span class="skill-pill font-mono text-xs border rounded-full px-4 py-1.5 transition-colors cursor-default" style="color:rgba(250,248,245,.55);border-color:rgba(250,248,245,.15)">SQL</span>
+    <span class="skill-pill font-mono text-xs border rounded-full px-4 py-1.5 transition-colors cursor-default" style="color:rgba(250,248,245,.55);border-color:rgba(250,248,245,.15)">Deep Learning</span>
+    <span class="skill-pill font-mono text-xs border rounded-full px-4 py-1.5 transition-colors cursor-default" style="color:rgba(250,248,245,.55);border-color:rgba(250,248,245,.15)">Generative AI</span>
+    <span class="skill-pill font-mono text-xs border rounded-full px-4 py-1.5 transition-colors cursor-default" style="color:rgba(250,248,245,.55);border-color:rgba(250,248,245,.15)">SageMaker</span>
+    <span class="skill-pill font-mono text-xs border rounded-full px-4 py-1.5 transition-colors cursor-default" style="color:rgba(250,248,245,.55);border-color:rgba(250,248,245,.15)">NLP</span>
+  </div>
+
+  <!-- Stats -->
+  <div id="stats-row" class="relative z-10 mt-20 grid grid-cols-2 md:grid-cols-4 gap-10" style="opacity:0;transform:translateY(24px)">
+    <div><span class="font-mono font-bold text-champagne" style="font-size:clamp(2rem,4vw,3rem)">$65M+</span><br><span class="font-sans text-sm" style="color:rgba(250,248,245,.45)">Revenue Impact</span></div>
+    <div><span class="font-mono font-bold text-champagne" style="font-size:clamp(2rem,4vw,3rem)">94.93%</span><br><span class="font-sans text-sm" style="color:rgba(250,248,245,.45)">NLP Accuracy</span></div>
+    <div><span class="font-mono font-bold text-champagne" style="font-size:clamp(2rem,4vw,3rem)">70%</span><br><span class="font-sans text-sm" style="color:rgba(250,248,245,.45)">Search Coverage</span></div>
+    <div><span class="font-mono font-bold text-champagne" style="font-size:clamp(2rem,4vw,3rem)">6+ yrs</span><br><span class="font-sans text-sm" style="color:rgba(250,248,245,.45)">Production ML</span></div>
+  </div>
+</section>
+
+
+<!-- ─────────────── PROTOCOL ─────────────── -->
+<section class="py-32 px-8 md:px-20" style="background:#0D0D12">
+  <div id="proto-head" class="mb-16" style="opacity:0;transform:translateY(40px)">
+    <p class="font-mono text-champagne text-xs uppercase mb-4" style="letter-spacing:.35em">The Process</p>
+    <h2 class="font-sans font-black text-ivory tracking-tight" style="font-size:clamp(2.2rem,6vw,4rem);line-height:.9">
+      How I<br>
+      <span class="font-serif italic text-champagne">Operate</span>
+    </h2>
+  </div>
+
+  <div class="space-y-5">
+
+    <!-- Step 01 -->
+    <div class="proto-card rounded-[3rem] border p-10 md:p-14 flex flex-col md:flex-row items-start md:items-center justify-between gap-10" style="background:#0D0D12;border-color:rgba(250,248,245,.08);opacity:0;transform:translateY(50px)">
+      <div class="flex-1">
+        <span class="font-mono text-champagne text-sm" style="letter-spacing:.2em">01</span>
+        <h3 class="font-sans font-black text-ivory mt-3 mb-5 tracking-tight" style="font-size:clamp(1.8rem,4vw,3rem)">Architect the System</h3>
+        <p class="font-sans leading-relaxed max-w-lg" style="color:rgba(250,248,245,.55);font-size:clamp(.9rem,1.4vw,1.1rem)">Design scalable ML pipelines and AI systems grounded in real production constraints — not academic ideals.</p>
+      </div>
+      <svg width="180" height="180" viewBox="0 0 200 200" style="flex-shrink:0;opacity:.25">
+        <g class="rotate-cw">
+          <circle cx="100" cy="100" r="88" fill="none" stroke="#C9A84C" stroke-width="1" stroke-dasharray="6 5"/>
+          <circle cx="100" cy="100" r="68" fill="none" stroke="#FAF8F5" stroke-width="0.5"/>
+          <circle cx="100" cy="100" r="48" fill="none" stroke="#C9A84C" stroke-width="1" stroke-dasharray="3 4"/>
+          <circle cx="100" cy="100" r="28" fill="none" stroke="#FAF8F5" stroke-width="0.5"/>
+          <circle cx="100" cy="100" r="8" fill="#C9A84C" fill-opacity="0.4"/>
+          <line x1="12" y1="100" x2="188" y2="100" stroke="#C9A84C" stroke-width="0.5" opacity="0.4"/>
+          <line x1="100" y1="12" x2="100" y2="188" stroke="#C9A84C" stroke-width="0.5" opacity="0.4"/>
+        </g>
+        <g class="rotate-ccw">
+          <polygon points="100,30 130,80 170,80 140,110 155,160 100,130 45,160 60,110 30,80 70,80" fill="none" stroke="#FAF8F5" stroke-width="0.4" opacity="0.3"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Step 02 -->
+    <div class="proto-card rounded-[3rem] border p-10 md:p-14 flex flex-col md:flex-row items-start md:items-center justify-between gap-10" style="background:#2A2A35;border-color:rgba(250,248,245,.1);opacity:0;transform:translateY(50px)">
+      <div class="flex-1">
+        <span class="font-mono text-champagne text-sm" style="letter-spacing:.2em">02</span>
+        <h3 class="font-sans font-black text-ivory mt-3 mb-5 tracking-tight" style="font-size:clamp(1.8rem,4vw,3rem)">Engineer the Model</h3>
+        <p class="font-sans leading-relaxed max-w-lg" style="color:rgba(250,248,245,.55);font-size:clamp(.9rem,1.4vw,1.1rem)">Build and train production-grade models: NLP, computer vision, ranking, recommendation, and agentic systems.</p>
+      </div>
+      <div style="position:relative;width:180px;height:180px;overflow:hidden;flex-shrink:0;opacity:.25">
+        <svg width="180" height="180" viewBox="0 0 180 180">
+          <defs><pattern id="dot-grid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="2" fill="#FAF8F5" opacity=".6"/></pattern></defs>
+          <rect width="180" height="180" fill="url(#dot-grid)"/>
+        </svg>
+        <div class="scan-beam" style="position:absolute;top:0;bottom:0;width:40px;background:linear-gradient(to right,transparent,rgba(201,168,76,.7),transparent)"></div>
+      </div>
+    </div>
+
+    <!-- Step 03 -->
+    <div class="proto-card rounded-[3rem] border p-10 md:p-14 flex flex-col md:flex-row items-start md:items-center justify-between gap-10" style="background:#18181F;border-color:rgba(201,168,76,.15);opacity:0;transform:translateY(50px)">
+      <div class="flex-1">
+        <span class="font-mono text-champagne text-sm" style="letter-spacing:.2em">03</span>
+        <h3 class="font-sans font-black text-ivory mt-3 mb-5 tracking-tight" style="font-size:clamp(1.8rem,4vw,3rem)">Deploy & Measure</h3>
+        <p class="font-sans leading-relaxed max-w-lg" style="color:rgba(250,248,245,.55);font-size:clamp(.9rem,1.4vw,1.1rem)">Ship to AWS infrastructure via SageMaker, Lambda, and API Gateway. Instrument everything. Move the metric.</p>
+      </div>
+      <svg width="180" height="180" viewBox="0 0 200 180" style="flex-shrink:0;opacity:.25">
+        <path d="M0,90 L18,90 L28,55 L38,125 L48,72 L58,108 L68,90 L88,90 L98,35 L108,145 L118,70 L128,110 L138,90 L158,90 L168,55 L178,125 L188,72 L200,90"
+          fill="none" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="wave-draw"/>
+        <path d="M0,90 L18,90 L28,55 L38,125 L48,72 L58,108 L68,90 L88,90 L98,35 L108,145 L118,70 L128,110 L138,90 L158,90 L168,55 L178,125 L188,72 L200,90"
+          fill="none" stroke="#FAF8F5" stroke-width="0.5" opacity=".3"/>
+      </svg>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ─────────────── CONTACT ─────────────── -->
+<section id="contact" class="py-40 px-8 md:px-20" style="background:#2A2A35">
+  <div id="contact-content" class="max-w-4xl mx-auto text-center flex flex-col items-center" style="opacity:0;transform:translateY(40px)">
+    <p class="font-mono text-champagne text-xs uppercase mb-6" style="letter-spacing:.35em">Get In Touch</p>
+    <h2 class="font-sans font-black text-ivory tracking-tight leading-none mb-6" style="font-size:clamp(3rem,10vw,8rem)">
+      Let's build<br>
+      <span class="font-serif italic text-champagne">something.</span>
+    </h2>
+    <p class="font-sans mb-12 max-w-md leading-relaxed" style="color:rgba(250,248,245,.45);font-size:clamp(.9rem,1.5vw,1.1rem)">
+      Open to senior ML/AI engineering roles, consulting engagements, and ambitious AI projects.
+      Based in Las Vegas — remote-friendly.
+    </p>
+    <div class="flex flex-col sm:flex-row items-center gap-4">
+      <a href="mailto:johnalexiv@gmail.com"
+        class="btn-mag bg-champagne text-obsidian font-sans font-bold text-sm tracking-widest uppercase px-10 py-4 rounded-full"
+      >
+        <span class="btn-slide bg-ivory"></span>
+        <span class="btn-label">Send Email</span>
+      </a>
+      <a href="https://linkedin.com/in/johnalexiv" target="_blank" rel="noopener noreferrer"
+        class="btn-mag font-sans font-bold text-sm tracking-widest uppercase px-10 py-4 rounded-full"
+        style="border:1px solid rgba(250,248,245,.22);color:#FAF8F5"
+      >
+        <span class="btn-slide" style="background:rgba(250,248,245,.08)"></span>
+        <span class="btn-label">LinkedIn ↗</span>
+      </a>
+    </div>
+    <div class="mt-14 flex items-center gap-6 flex-wrap justify-center">
+      <span class="font-mono text-xs" style="color:rgba(250,248,245,.3);letter-spacing:.15em">702-324-7263</span>
+      <span class="w-px h-4" style="background:rgba(250,248,245,.15)"></span>
+      <span class="font-mono text-xs" style="color:rgba(250,248,245,.3);letter-spacing:.15em">Las Vegas, NV</span>
+      <span class="w-px h-4" style="background:rgba(250,248,245,.15)"></span>
+      <span class="font-mono text-xs" style="color:rgba(250,248,245,.3);letter-spacing:.15em">linkedin.com/in/johnalexiv</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ─────────────── FOOTER ─────────────── -->
+<footer class="px-8 md:px-20 pt-20 pb-12" style="background:#08080E;border-radius:4rem 4rem 0 0">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+    <div class="md:col-span-2">
+      <div class="font-sans font-black text-ivory text-3xl tracking-tight mb-2">John Alexander</div>
+      <div class="font-mono text-champagne text-xs uppercase mb-5" style="letter-spacing:.2em">Senior Data Scientist · MLOps · E2E AI/ML</div>
+      <p class="font-sans text-sm leading-relaxed max-w-xs" style="color:rgba(250,248,245,.35)">
+        Building scalable AI/ML systems that drive measurable business outcomes. Las Vegas, NV.
+      </p>
+    </div>
+    <div>
+      <div class="font-mono uppercase mb-5" style="font-size:10px;color:rgba(250,248,245,.25);letter-spacing:.3em">Navigate</div>
+      <div class="flex flex-col gap-3">
+        <a href="#about"      class="link-lift font-sans text-sm transition-colors" style="color:rgba(250,248,245,.5)">About</a>
+        <a href="#experience" class="link-lift font-sans text-sm transition-colors" style="color:rgba(250,248,245,.5)">Experience</a>
+        <a href="#skills"     class="link-lift font-sans text-sm transition-colors" style="color:rgba(250,248,245,.5)">Skills</a>
+        <a href="#contact"    class="link-lift font-sans text-sm transition-colors" style="color:rgba(250,248,245,.5)">Contact</a>
+      </div>
+    </div>
+    <div>
+      <div class="font-mono uppercase mb-5" style="font-size:10px;color:rgba(250,248,245,.25);letter-spacing:.3em">Contact</div>
+      <div class="flex flex-col gap-3">
+        <a href="mailto:johnalexiv@gmail.com" class="link-lift font-sans text-sm break-all transition-colors" style="color:rgba(250,248,245,.5)">johnalexiv@gmail.com</a>
+        <a href="https://linkedin.com/in/johnalexiv" target="_blank" rel="noopener noreferrer" class="link-lift font-sans text-sm transition-colors" style="color:rgba(250,248,245,.5)">linkedin.com/in/johnalexiv</a>
+        <span class="font-sans text-sm" style="color:rgba(250,248,245,.3)">Las Vegas, NV</span>
+      </div>
+    </div>
+  </div>
+  <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4" style="border-top:1px solid rgba(250,248,245,.08);padding-top:2rem">
+    <div class="flex items-center gap-2.5">
+      <span class="pulse-dot rounded-full" style="background:#34d399;width:8px;height:8px;display:inline-block"></span>
+      <span class="font-mono text-xs" style="color:rgba(250,248,245,.35);letter-spacing:.2em">SYSTEM OPERATIONAL</span>
+    </div>
+    <div class="font-mono text-xs" style="color:rgba(250,248,245,.2)">© 2026 John Alexander · All rights reserved</div>
+  </div>
+</footer>
+
+
+<!-- ─────────────── JAVASCRIPT ─────────────── -->
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+/* ── Navbar scroll morph ── */
+const navbar = document.getElementById('navbar');
+const navLogo = document.getElementById('nav-logo');
+window.addEventListener('scroll', function() {
+  if (window.scrollY > 80) {
+    navbar.classList.add('nav-scrolled');
+    navLogo.style.color = '#C9A84C';
+  } else {
+    navbar.classList.remove('nav-scrolled');
+    navLogo.style.color = 'rgba(250,248,245,.8)';
+  }
+}, { passive: true });
+
+/* ── Hero entrance ── */
+gsap.fromTo(
+  ['#hero-eyebrow','#hero-line1','#hero-line2','#hero-body','#hero-cta'],
+  { y: 40, opacity: 0 },
+  { y: 0, opacity: 1, duration: 1.2, ease: 'power3.out', stagger: 0.08, delay: 0.25 }
+);
+
+/* ── ScrollTrigger helper ── */
+function revealOnScroll(selector, vars) {
+  document.querySelectorAll(selector).forEach(function(el) {
+    gsap.to(el, Object.assign({ scrollTrigger: { trigger: el, start: 'top 85%' } }, vars));
+  });
+}
+
+revealOnScroll('#feat-head',      { y: 0, opacity: 1, duration: 1,   ease: 'power3.out' });
+revealOnScroll('#exp-head',       { y: 0, opacity: 1, duration: 1,   ease: 'power3.out' });
+revealOnScroll('#proto-head',     { y: 0, opacity: 1, duration: 1,   ease: 'power3.out' });
+revealOnScroll('#phil-contra',    { y: 0, opacity: 1, duration: .8,  ease: 'power3.out' });
+revealOnScroll('#phil-main',      { y: 0, opacity: 1, duration: .9,  ease: 'power3.out' });
+revealOnScroll('#skills-pills',   { y: 0, opacity: 1, duration: .8,  ease: 'power3.out' });
+revealOnScroll('#stats-row',      { y: 0, opacity: 1, duration: .8,  ease: 'power3.out' });
+revealOnScroll('#contact-content',{ y: 0, opacity: 1, duration: 1,   ease: 'power3.out' });
+
+gsap.fromTo('#card1', { y:60, opacity:0 }, { y:0, opacity:1, duration:.9, ease:'power3.out', scrollTrigger:{trigger:'#card1',start:'top 80%'} });
+gsap.fromTo('#card2', { y:60, opacity:0 }, { y:0, opacity:1, duration:.9, ease:'power3.out', delay:.15, scrollTrigger:{trigger:'#card1',start:'top 80%'} });
+gsap.fromTo('#card3', { y:60, opacity:0 }, { y:0, opacity:1, duration:.9, ease:'power3.out', delay:.3, scrollTrigger:{trigger:'#card1',start:'top 80%'} });
+
+document.querySelectorAll('.exp-item').forEach(function(el, i) {
+  gsap.to(el, { x:0, opacity:1, duration:.9, ease:'power3.out', delay: i*.12, scrollTrigger:{trigger:el,start:'top 85%'} });
+});
+
+/* ── Protocol stacking ── */
+var protoCards = Array.from(document.querySelectorAll('.proto-card'));
+protoCards.forEach(function(card, i) {
+  gsap.to(card, { y:0, opacity:1, duration:.9, ease:'power3.out', scrollTrigger:{trigger:card,start:'top 88%'} });
+  if (i < protoCards.length - 1) {
+    ScrollTrigger.create({
+      trigger: protoCards[i+1],
+      start: 'top 75%',
+      onEnter: function() { gsap.to(card, { scale:.93, filter:'blur(3px)', opacity:.45, duration:.55, ease:'power2.inOut' }); },
+      onLeaveBack: function() { gsap.to(card, { scale:1, filter:'blur(0px)', opacity:1, duration:.55, ease:'power2.inOut' }); }
+    });
+  }
+});
+
+
+/* ─────────────────────────────────────────
+   CARD 1: Diagnostic Shuffler
+───────────────────────────────────────── */
+var shuffleLabels = ['Intent Classification','Entity Extraction','Conversational AI'];
+var shuffleOrder  = [0,1,2];
+
+function buildShuffler() {
+  var stack = document.getElementById('shuffler-stack');
+  stack.innerHTML = '';
+  shuffleOrder.forEach(function(idx, pos) {
+    var div = document.createElement('div');
+    div.className = 'shuffle-card spring';
+    div.style.top    = (pos * 20) + 'px';
+    div.style.zIndex = shuffleOrder.length - pos;
+    div.style.opacity = Math.max(0, 1 - pos * 0.28);
+    div.style.transform = 'scale(' + (1 - pos * 0.04) + ')';
+    div.style.transformOrigin = 'top center';
+
+    var lbl = document.createElement('span');
+    lbl.className = 'font-sans font-semibold text-obsidian text-sm';
+    lbl.textContent = shuffleLabels[idx];
+
+    var dot = document.createElement('span');
+    dot.style.cssText = 'width:8px;height:8px;border-radius:999px;flex-shrink:0;background:' + (pos===0 ? '#C9A84C' : 'rgba(0,0,0,.15)');
+
+    div.appendChild(lbl);
+    div.appendChild(dot);
+    stack.appendChild(div);
+  });
+}
+
+buildShuffler();
+setInterval(function() {
+  shuffleOrder.unshift(shuffleOrder.pop());
+  buildShuffler();
+}, 3000);
+
+
+/* ─────────────────────────────────────────
+   CARD 2: Telemetry Typewriter
+───────────────────────────────────────── */
+var feedMessages = [
+  '> ML ranking deployed → 70% of search users',
+  '> CTR delta: +1.03%',
+  '> Annualized sales lift: ~$30M',
+  '> Query understanding: multi-region active',
+  '> Autofilter: brand · gender · product_type',
+  '> Image embeddings: full catalog indexed',
+  '> Shoe size model: 25% PDP coverage',
+  '> Return rate reduction: 10.09%',
+];
+var feedLineIdx  = 0;
+var feedCharIdx  = 0;
+var feedCurrent  = '';
+var completedLines = [];
+
+function feedTick() {
+  var currentEl = document.getElementById('feed-current');
+  var linesEl   = document.getElementById('feed-lines');
+
+  if (feedLineIdx >= feedMessages.length) {
+    setTimeout(function() {
+      completedLines = [];
+      feedLineIdx = 0;
+      feedCharIdx = 0;
+      feedCurrent = '';
+      if (linesEl) linesEl.innerHTML = '';
+      if (currentEl) currentEl.innerHTML = '';
+      setTimeout(feedTick, 300);
+    }, 2500);
+    return;
+  }
+
+  if (feedCharIdx < feedMessages[feedLineIdx].length) {
+    feedCurrent += feedMessages[feedLineIdx][feedCharIdx];
+    feedCharIdx++;
+    if (currentEl) currentEl.innerHTML = feedCurrent + '<span class="blink">█</span>';
+    setTimeout(feedTick, 38);
+  } else {
+    completedLines.push(feedMessages[feedLineIdx]);
+    feedCurrent = '';
+    feedCharIdx = 0;
+    feedLineIdx++;
+    var visible = completedLines.slice(-5);
+    if (linesEl) linesEl.innerHTML = visible.map(function(l){ return '<div>' + l + '</div>'; }).join('');
+    if (currentEl) currentEl.innerHTML = '<span class="blink">█</span>';
+    setTimeout(feedTick, 350);
+  }
+}
+feedTick();
+
+
+/* ─────────────────────────────────────────
+   CARD 3: Cursor Scheduler
+───────────────────────────────────────── */
+var dayNames = ['S','M','T','W','T','F','S'];
+var activeDaysList = [];
+var cursorDay = -99;
+
+function buildGrid() {
+  var grid = document.getElementById('day-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  dayNames.forEach(function(d, i) {
+    var col = document.createElement('div');
+    col.className = 'flex flex-col items-center gap-1';
+
+    var label = document.createElement('span');
+    label.className = 'font-mono';
+    label.style.cssText = 'font-size:10px;color:rgba(42,42,53,.35)';
+    label.textContent = d;
+
+    var cell = document.createElement('div');
+    cell.id = 'day-' + i;
+    var isActive  = activeDaysList.indexOf(i) !== -1;
+    var isCursor  = (cursorDay === i);
+    cell.style.cssText = 'width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;transition:all .2s ease;';
+    if      (isActive)  { cell.style.background = '#C9A84C'; cell.style.boxShadow = '0 4px 12px rgba(201,168,76,.3)'; }
+    else if (isCursor)  { cell.style.background = 'rgba(0,0,0,.08)'; cell.style.outline = '2px solid rgba(201,168,76,.6)'; }
+    else                { cell.style.background = 'rgba(0,0,0,.04)'; }
+
+    var num = document.createElement('span');
+    num.className = 'font-mono font-bold';
+    num.style.cssText = 'font-size:11px;color:' + (isActive ? '#0D0D12' : 'rgba(42,42,53,.35)');
+    num.textContent = i + 1;
+
+    cell.appendChild(num);
+    col.appendChild(label);
+    col.appendChild(cell);
+    grid.appendChild(col);
+  });
+}
+
+buildGrid();
+
+var schedAlive = true;
+var schedSequence = (function() {
+  var highlights = [{day:3, label:'+$30M annualized'},{day:5, label:'+$25M projected'}];
+  var hi = 0;
+
+  function sleep(ms, cb) { setTimeout(cb, ms); }
+
+  function reset() {
+    activeDaysList = [];
+    cursorDay = -99;
+    document.getElementById('sched-label').textContent = 'Calculating impact…';
+    var btn = document.getElementById('deploy-btn');
+    if (btn) btn.style.display = 'none';
+    buildGrid();
+    sleep(1000, step);
+  }
+
+  function step() {
+    if (hi >= highlights.length) {
+      // Show save
+      var btn = document.getElementById('deploy-btn');
+      if (btn) { btn.style.display = 'block'; btn.style.transform = 'scale(1)'; }
+      sleep(500, function() {
+        if (btn) btn.style.transform = 'scale(.9)';
+        sleep(250, function() {
+          if (btn) btn.style.transform = 'scale(1)';
+          sleep(1200, function() {
+            if (btn) btn.style.display = 'none';
+            hi = 0;
+            sleep(1800, reset);
+          });
+        });
+      });
+      return;
+    }
+    var h = highlights[hi];
+    cursorDay = h.day;
+    buildGrid();
+    sleep(600, function() {
+      // Press
+      var cell = document.getElementById('day-' + h.day);
+      if (cell) cell.style.transform = 'scale(.88)';
+      sleep(200, function() {
+        if (cell) cell.style.transform = 'scale(1)';
+        activeDaysList.push(h.day);
+        document.getElementById('sched-label').textContent = h.label;
+        buildGrid();
+        hi++;
+        sleep(800, step);
+      });
+    });
+  }
+
+  return reset;
+})();
+
+schedSequence();
+</script>
+
+</body>
+</html>
